@@ -10,7 +10,7 @@ export default function StaffPage() {
   const [pw, setPw] = useState('')
   const [err, setErr] = useState('')
   const [tab, setTab] = useState('2026年9月')
-  const [rows, setRows] = useState([])
+  const [rows, setRows] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
 
   const login = () => {
@@ -27,10 +27,10 @@ export default function StaffPage() {
       .then(({data}) => { setRows(data || []); setLoading(false) })
   }, [authed, tab])
 
-  const togglePayment = async (rowId, cur) => {
+  const togglePayment = async (rowId: string, cur: string) => {
     const next = cur === 'paid' ? 'unpaid' : 'paid'
     await supabase.from('applicants').update({payment_status: next}).eq('id', rowId)
-    setRows(r => r.map(x => x.id === rowId ? {...x, payment_status: next} : x))
+    setRows(r => r.map((x: any) => x.id === rowId ? {...x, payment_status: next} : x))
   }
 
   if (!authed) return (
@@ -44,86 +44,65 @@ export default function StaffPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">ログインID</label>
-            <input className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-500" value={id} onChange={e=>setId(e.target.value)} placeholder="ID"/>
+            <input className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" value={id} onChange={e => setId(e.target.value)} />
           </div>
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1">パスワード</label>
-            <input className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-teal-500" type="password" value={pw} onChange={e=>setPw(e.target.value)} onKeyDown={e=>e.key==='Enter'&&login()}/>
+            <input type="password" className="w-full border border-slate-200 rounded-lg px-4 py-2.5 text-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400" value={pw} onChange={e => setPw(e.target.value)} />
           </div>
-          {err && <p className="text-red-500 text-sm text-center">{err}</p>}
-          <button onClick={login} className="w-full bg-slate-800 text-white py-3 rounded-xl font-bold hover:bg-slate-700 transition-colors">ログイン</button>
+          {err && <p className="text-red-500 text-sm">{err}</p>}
+          <button onClick={login} className="w-full bg-blue-600 text-white rounded-lg py-2.5 font-semibold hover:bg-blue-700 transition-colors">ログイン</button>
         </div>
       </div>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-slate-800 text-white py-4 px-6 flex justify-between items-center">
-        <div>
-          <p className="text-xs text-slate-400 uppercase tracking-widest">ADMIN</p>
-          <h1 className="text-lg font-bold">販売者認定講習・試験 管理画面</h1>
-        </div>
-        <button onClick={()=>setAuthed(false)} className="text-slate-400 hover:text-white text-sm">ログアウト</button>
-      </header>
-      <main className="max-w-6xl mx-auto py-8 px-6">
-        <div className="flex gap-3 mb-6">
+    <div className="min-h-screen bg-slate-100 p-6">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-2xl font-bold text-slate-800 mb-6">申込者管理</h1>
+        <div className="flex gap-2 mb-6">
           {TABS.map(t => (
-            <button key={t} onClick={()=>setTab(t)}
-              className={`px-5 py-2.5 rounded-lg font-bold text-sm transition-colors ${tab===t?'bg-teal-600 text-white':'bg-white text-slate-600 border border-slate-200 hover:border-teal-400'}`}>
+            <button key={t} onClick={() => setTab(t)}
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${tab === t ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:bg-blue-50'}`}>
               {t}
             </button>
           ))}
         </div>
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-100 flex justify-between items-center">
-            <h2 className="font-bold text-slate-800">{tab} 申込者一覧</h2>
-            <span className="text-sm text-slate-500">{rows.length}名</span>
-          </div>
-          {loading ? (
-            <div className="p-12 text-center text-slate-400">読み込み中...</div>
-          ) : rows.length === 0 ? (
-            <div className="p-12 text-center text-slate-400">申込みはありません</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500">申込日時</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500">氏名</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500">都道府県</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500">代理店</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500">メール</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500">電話</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-slate-500">受講料</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {rows.map(r => (
-                    <tr key={r.id} className="hover:bg-slate-50">
-                      <td className="px-4 py-3 text-slate-500">{new Date(r.created_at).toLocaleDateString('ja-JP')}</td>
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-slate-800">{r.name}</div>
-                        <div className="text-xs text-slate-400">{r.furigana}</div>
-                      </td>
-                      <td className="px-4 py-3 text-slate-600">{r.prefecture}</td>
-                      <td className="px-4 py-3 text-slate-600">{r.agency}</td>
-                      <td className="px-4 py-3 text-slate-600">{r.email}</td>
-                      <td className="px-4 py-3 text-slate-600">{r.phone}</td>
-                      <td className="px-4 py-3">
-                        <button onClick={()=>togglePayment(r.id, r.payment_status)}
-                          className={`px-3 py-1 rounded-full text-xs font-bold ${r.payment_status==='paid'?'bg-green-100 text-green-700':'bg-orange-100 text-orange-700'}`}>
-                          {r.payment_status === 'paid' ? '✓ 決済済み' : '未決済'}
-                        </button>
-                      </td>
-                    </tr>
+        {loading ? <p>読み込み中...</p> : (
+          <div className="bg-white rounded-2xl shadow overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 border-b">
+                <tr>
+                  {['氏名','フリガナ','メール','電話','都道府県','所属代理店','受講月','支払'].map(h => (
+                    <th key={h} className="px-4 py-3 text-left font-semibold text-slate-600">{h}</th>
                   ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </main>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row: any) => (
+                  <tr key={row.id} className="border-b hover:bg-slate-50">
+                    <td className="px-4 py-3">{row.name}</td>
+                    <td className="px-4 py-3">{row.furigana}</td>
+                    <td className="px-4 py-3">{row.email}</td>
+                    <td className="px-4 py-3">{row.phone}</td>
+                    <td className="px-4 py-3">{row.prefecture}</td>
+                    <td className="px-4 py-3">{row.agency}</td>
+                    <td className="px-4 py-3">{row.desired_month}</td>
+                    <td className="px-4 py-3">
+                      <button onClick={() => togglePayment(row.id, row.payment_status)}
+                        className={`px-3 py-1 rounded-full text-xs font-bold ${row.payment_status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {row.payment_status === 'paid' ? '支払済' : '未払い'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {rows.length === 0 && <p className="text-center py-8 text-slate-500">データなし</p>}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
