@@ -108,7 +108,7 @@ function CompleteContent() {
                 disabled={bankNotifying}
                 className="w-full bg-green-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
               >
-                {bankNotifying ? '送信中...' : '🏦 銀行振込を選択する（事務局に通知）'}
+                {bankNotifying ? '送信中...' : '🏦 銀行振込の方はここをクリック'}
               </button>
             )}
           </div>
