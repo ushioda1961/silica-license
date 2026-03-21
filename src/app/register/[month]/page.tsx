@@ -74,12 +74,17 @@ export default function RegisterPage({ params }: { params: { month: string } }) 
                                                                                                                 </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Q1. 今回の講習を知ったきっかけ</label>
-            <input className="w-full border border-gray-300 rounded-lg px-3 py-2" value={form.survey_q1} onChange={e => set('survey_q1', e.target.value)} />
+            <label className="block text-sm font-semibold text-gray-700 mb-2">１．あなたは認定試験に合格したのは何年前ですか？</label>
+            {['去年','2年前','3年前','4年前','5年前以降','未受験'].map(v => (
+              <label key={v} className="flex items-center gap-2 mt-1 cursor-pointer">
+                <input type="checkbox" checked={form.survey_q1.includes(v)} onChange={() => toggle('survey_q1', v)} />
+                {v}
+              </label>
+            ))}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Q2. 受講の目的（複数選択可）</label>
-            {['資格取得','スキルアップ','会社からの指示','更新のため','その他'].map(v => (
+            <label className="block text-sm font-semibold text-gray-700 mb-2">２．あなたのご職業・ビジネスジャンルをお選び下さい</label>
+            {['整体師・カイロプラクター・鍼灸師などの手技療法系','エステ・美容サロンオーナー','ヒーラー・チャネラー・占い師などのスピリチュアル系','クリニック・歯科・医療関連','飲食店・カフェ・レストランオーナー','雑貨・健康食品などの物販店舗オーナー','オンライン販売（ECサイト・SNS）専業','その他'].map(v => (
               <label key={v} className="flex items-center gap-2 mt-1 cursor-pointer">
                 <input type="checkbox" checked={form.survey_q2.includes(v)} onChange={() => toggle('survey_q2', v)} />
                 {v}
@@ -87,8 +92,8 @@ export default function RegisterPage({ params }: { params: { month: string } }) 
             ))}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Q3. 過去の受講経験（複数選択可）</label>
-            {['初めて','1回','2〜3回','4回以上'].map(v => (
+            <label className="block text-sm font-semibold text-gray-700 mb-2">３．お客様への販売において、現在最も大きな課題はどれですか？（複数選択可）</label>
+            {['商品の科学的根拠・エビデンスの説明が難しい','価格に対してお客様の納得を得るのが難しい','他社類似製品との差別化説明が難しい','自分自身の商品知識・成分知識が不足している','新規顧客への入口商品として提案しにくい','リピート購入につながりにくい','SNS・オンラインでの発信方法がわからない','特に課題は感じていない'].map(v => (
               <label key={v} className="flex items-center gap-2 mt-1 cursor-pointer">
                 <input type="checkbox" checked={form.survey_q3.includes(v)} onChange={() => toggle('survey_q3', v)} />
                 {v}
@@ -96,8 +101,8 @@ export default function RegisterPage({ params }: { params: { month: string } }) 
             ))}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Q4. 希望する講習形式（複数選択可）</label>
-            {['会場受講','オンライン','どちらでも可'].map(v => (
+            <label className="block text-sm font-semibold text-gray-700 mb-2">４．認定講習を通じて、最も強化したい知識・スキルは何ですか？（複数選択可）</label>
+            {['ケイ素の成分・科学的メカニズムの深い理解','体質別・症状別の具体的な活用提案の方法','お客様への効果的なセールストーク・説明話法','SNS・ブログ等での情報発信・集客方法','他商品・他サービスとの組み合わせ提案','クレーム対応・注意事項の知識','新規顧客の開拓方法','販売実績を上げた成功事例・ロールプレイング'].map(v => (
               <label key={v} className="flex items-center gap-2 mt-1 cursor-pointer">
                 <input type="checkbox" checked={form.survey_q4.includes(v)} onChange={() => toggle('survey_q4', v)} />
                 {v}
