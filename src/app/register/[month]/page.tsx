@@ -91,7 +91,7 @@ export default function RegisterPage({ params }: { params: { month: string } }) 
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">３．お客様への販売において、現在最も大きな課題はどれですか？（複数選択可）</label>
-            {['商品の科学的根拠・エビデンスの説明が難しい','価格に対してお客様の納得を得るのが難しい','他社類似製品との差別化説明が難しい','自分自身の商品知識・成分知識が不足している','新規顧客への入口商品として提案しにくい','リピート購入につながりにくい','SNS・オンラインでの発信方法がわからない','特に課題は感じていない'].map(v => (
+            {['価格に対してお客様の納得を得るのが難しい','他社類似製品との差別化説明が難しい','自分自身の商品知識・成分知識が不足している','新規顧客への入口商品として提案しにくい','リピート購入につながりにくい','SNS・オンラインでの発信方法がわからない','特に課題は感じていない'].map(v => (
               <label key={v} className="flex items-center gap-2 mt-1 cursor-pointer">
                 <input type="checkbox" checked={form.survey_q3.includes(v)} onChange={() => toggle('survey_q3', v)} />
                 {v}
