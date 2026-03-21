@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, Suspense } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 
 declare global {
@@ -14,6 +14,8 @@ function CompleteContent() {
   const rendered = useRef(false)
   const searchParams = useSearchParams()
   const applicantId = searchParams.get('id')
+  const [bankNotified, setBankNotified] = useState(false)
+  const [bankNotifying, setBankNotifying] = useState(false)
 
   useEffect(() => {
     if (rendered.current) return
@@ -27,7 +29,7 @@ function CompleteContent() {
         style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'pay' },
         createOrder: (_data: any, actions: any) => {
           return actions.order.create({
-            purchase_units: [{ amount: { value: AMOUNT, currency_code: 'JPY' }, description: '販売者認定講習・試験 受講料' }],
+            purchase_units: [{ amount: { value: AMOUNT, currency_code: 'JPY' }, description: '販売ライセンス更新用認定講習・試験 受講料' }],
           })
         },
         onApprove: async (_data: any, actions: any) => {
@@ -46,6 +48,22 @@ function CompleteContent() {
     }
     document.body.appendChild(script)
   }, [])
+
+  const handleBankTransfer = async () => {
+    setBankNotifying(true)
+    try {
+      await fetch('/api/notify-bank-transfer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: applicantId }),
+      })
+      setBankNotified(true)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setBankNotifying(false)
+    }
+  }
 
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -79,8 +97,65 @@ function CompleteContent() {
             <tr className="border-b"><td className="py-2 text-gray-500">口座種別</td><td className="py-2 font-medium text-gray-800">普通</td></tr>
             <tr className="border-b"><td className="py-2 text-gray-500">口座番号</td><td className="py-2 font-bold text-gray-900 text-base">2144755</td></tr>
             <tr><td className="py-2 text-gray-500">口座名義</td><td className="py-2 font-medium text-gray-800">カ）ユープランニング</td></tr>
-          </tbody></table>
+          </tbody></table>import { NextResponse } from 'next/server'
+import { supabase } from '@/lib/supabase'
+import { Resend } from 'resend'
+const resend = new Resend(process.env.RESEND_API_KEY)
+
+export async function POST(req: Request) {
+  try {
+    const { id } = await req.json()
+    if (!id) return NextResponse.json({ error: 'No id' }, { status: 400 })
+
+    // 申込者情報を取得
+    const { data, error } = await supabase
+      .from('applicants')
+      .select('name, furigana, email, phone, desired_month, agency')
+      .eq('id', id)
+      .single()
+
+    if (error || !data) throw error
+
+    // 管理者に銀行振込選択の通知メールを送信
+    await resend.emails.send({
+      from: '販売者認定講習事務局 <mail@you-planning.org>',
+      to: ['mail@you-planning.org'],
+      subject: `【銀行振込】${data.name}様が銀行振込を選択しました`,
+      html: `
+        <h2>🏦 銀行振込のご連絡</h2>
+        <p>以下の申込者が銀行振込でのお支払いを選択しました。<br>入金確認をお願いします。</p>
+        <table border="1" cellpadding="8" style="border-collapse:collapse">
+          <tr><th>氏名</th><td>${data.name}（${data.furigana}）</td></tr>
+          <tr><th>メール</th><td>${data.email}</td></tr>
+          <tr><th>電話</th><td>${data.phone}</td></tr>
+          <tr><th>受講月</th><td>${data.desired_month}</td></tr>
+          <tr><th>所属代理店</th><td>${data.agency}</td></tr>
+          <tr><th>振込金額</th><td><strong>¥5,500</strong></td></tr>
+        </table>
+        <p style="color:#e67e22;font-weight:bold;">⚠️ 入金確認後、管理画面で「支払済」に変更してください。</p>
+      `,
+    })
+
+    return NextResponse.json({ ok: true })
+  } catch (e) {
+    console.error(e)
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+  }
+}
           <p className="text-xs text-gray-500 mt-3 text-center">※振込手数料はご負担ください</p>
+          <div className="mt-4">
+            {bankNotified ? (
+              <p className="text-center text-green-600 font-semibold text-sm">✅ 事務局に銀行振込のご連絡をしました</p>
+            ) : (
+              <button
+                onClick={handleBankTransfer}
+                disabled={bankNotifying}
+                className="w-full bg-green-600 text-white py-2 rounded-lg text-sm font-semibold hover:bg-green-700 disabled:opacity-50 transition-colors"
+              >
+                {bankNotifying ? '送信中...' : '🏦 銀行振込を選択する（事務局に通知）'}
+              </button>
+            )}
+          </div>
         </div>
         <p className="text-xs text-gray-400 mt-2">ご不明な点はお問い合わせください。</p>
       </div>
