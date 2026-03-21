@@ -14,7 +14,7 @@ export default function StaffPage() {
   const [loading, setLoading] = useState(false)
 
   const login = () => {
-    if (id === 'silica4' && pw === 'pass14') { setAuthed(true); setErr('') }
+    if (id === 'si14' && pw === 'pass14') { setAuthed(true); setErr('') }
     else setErr('IDまたはパスワードが違います')
   }
 

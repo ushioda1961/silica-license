@@ -66,7 +66,12 @@ export default function RegisterPage({ params }: { params: { month: string } }) 
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">所属代理店名 <span className="text-red-500">*</span></label>
-            <input className="w-full border border-gray-300 rounded-lg px-3 py-2" value={form.agency} onChange={e => set('agency', e.target.value)} />
+                      <select className="w-full border border-gray-300 rounded-lg px-3 py-2" value={form.agency} onChange={e => set('agency', e.target.value)}>
+                                        <option value="">選択してください</option>
+                                                          {['牛王田雅章','川上利夫','藤井佑昴','池尾里絵'].map(a =>
+                                                                              <option key={a} value={a}>{a}</option>
+                                                                                                )}
+                                                                                                                </select>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Q1. 今回の講習を知ったきっかけ</label>
