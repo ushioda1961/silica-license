@@ -6,7 +6,7 @@ export default function Home() {
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full">
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">
-          販売者認定講習・試験
+          販売ライセンス更新用認定講習・試験
         </h1>
         <h2 className="text-lg text-center text-gray-600 mb-6">
           申込みフォーム
