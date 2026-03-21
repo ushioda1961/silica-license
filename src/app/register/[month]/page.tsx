@@ -30,7 +30,7 @@ export default function RegisterPage({ params }: { params: { month: string } }) 
       body: JSON.stringify({ ...form, desired_month: `2026年${params.month}月` }),
     })
     setLoading(false)
-    if (res.ok) router.push('/complete')
+    if (res.ok) { const d = await res.json(); router.push(`/complete?id=${d.id}`) }
     else alert('送信に失敗しました。もう一度お試しください。')
   }
   return (

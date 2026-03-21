@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 declare global {
   interface Window { paypal: any }
@@ -11,6 +12,8 @@ const AMOUNT = '5500'
 export default function CompletePage() {
   const paypalRef = useRef<HTMLDivElement>(null)
   const rendered = useRef(false)
+  const searchParams = useSearchParams()
+  const applicantId = searchParams.get('id')
 
   useEffect(() => {
     if (rendered.current) return
@@ -33,7 +36,14 @@ export default function CompletePage() {
         },
         onApprove: async (_data: any, actions: any) => {
           await actions.order.capture()
-          alert('お支払いが完了しました！ありがとうございます。')
+          if (applicantId) {
+            await fetch('/api/payment-complete', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: applicantId }),
+            })
+          }
+          alert('お支払いが完了しました！管理画面の支払い状況が自動的に「支払済」に更新されます。')
         },
         onError: (err: any) => {
           console.error(err)
