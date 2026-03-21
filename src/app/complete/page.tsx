@@ -22,12 +22,7 @@ export default function CompletePage() {
     script.onload = () => {
       if (!paypalRef.current) return
       window.paypal.Buttons({
-        style: {
-          layout: 'vertical',
-          color: 'blue',
-          shape: 'rect',
-          label: 'pay',
-        },
+        style: { layout: 'vertical', color: 'blue', shape: 'rect', label: 'pay' },
         createOrder: (_data: any, actions: any) => {
           return actions.order.create({
             purchase_units: [{
@@ -53,34 +48,57 @@ export default function CompletePage() {
     <main className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md w-full text-center">
         <div className="text-5xl mb-4">✅</div>
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          申込みが完了しました
-        </h1>
-        <p className="text-gray-600 mb-6">
-          ご登録のメールアドレスに確認メールをお送りしました。
-        </p>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">申込みが完了しました</h1>
+        <p className="text-gray-600 mb-6">ご登録のメールアドレスに確認メールをお送りしました。</p>
 
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
           <p className="text-sm text-blue-700 font-semibold mb-1">受講料お支払い</p>
           <p className="text-3xl font-bold text-blue-800 mb-1">¥5,500</p>
-          <p className="text-xs text-blue-600">下記よりお支払いをお願いします</p>
+          <p className="text-xs text-blue-600">下記いずれかの方法でお支払いください</p>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-6">
           <p className="text-sm font-semibold text-gray-700 mb-3">💳 PayPalでお支払い</p>
           <div ref={paypalRef} />
         </div>
 
-        <div className="border-t pt-4 mt-2">
+        <div className="border rounded-xl p-4 mb-6 text-left bg-gray-50">
+          <p className="text-sm font-semibold text-gray-700 mb-3 text-center">🏦 銀行振込でお支払い</p>
+          <table className="w-full text-sm">
+            <tbody>
+              <tr className="border-b">
+                <td className="py-2 text-gray-500 w-24">銀行名</td>
+                <td className="py-2 font-medium text-gray-800">GMOあおぞらネット銀行</td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 text-gray-500">支店名</td>
+                <td className="py-2 font-medium text-gray-800">法人営業部</td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 text-gray-500">口座種別</td>
+                <td className="py-2 font-medium text-gray-800">普通</td>
+              </tr>
+              <tr className="border-b">
+                <td className="py-2 text-gray-500">口座番号</td>
+                <td className="py-2 font-bold text-gray-900 text-base">2144755</td>
+              </tr>
+              <tr>
+                <td className="py-2 text-gray-500">口座名義</td>
+                <td className="py-2 font-medium text-gray-800">カ）ユープランニング</td>
+              </tr>
+            </tbody>
+          </table>
+          <p className="text-xs text-gray-500 mt-3 text-center">※振込手数料はご負担ください</p>
+        </div>
+
+        <div className="border-t pt-4">
           <p className="text-sm font-semibold text-gray-700 mb-2">📱 PayPayでお支払い</p>
           <p className="text-xs text-gray-500 bg-gray-100 rounded-lg p-3">
             PayPay決済は現在準備中です。<br />まもなくご利用いただけます。
           </p>
         </div>
 
-        <p className="text-xs text-gray-400 mt-6">
-          ご不明な点はお問い合わせください。
-        </p>
+        <p className="text-xs text-gray-400 mt-6">ご不明な点はお問い合わせください。</p>
       </div>
     </main>
   )
