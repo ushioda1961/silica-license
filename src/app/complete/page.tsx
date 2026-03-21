@@ -91,14 +91,7 @@ export default function CompletePage() {
           <p className="text-xs text-gray-500 mt-3 text-center">※振込手数料はご負担ください</p>
         </div>
 
-        <div className="border-t pt-4">
-          <p className="text-sm font-semibold text-gray-700 mb-2">📱 PayPayでお支払い</p>
-          <p className="text-xs text-gray-500 bg-gray-100 rounded-lg p-3">
-            PayPay決済は現在準備中です。<br />まもなくご利用いただけます。
-          </p>
-        </div>
-
-        <p className="text-xs text-gray-400 mt-6">ご不明な点はお問い合わせください。</p>
+        <p className="text-xs text-gray-400 mt-2">ご不明な点はお問い合わせください。</p>
       </div>
     </main>
   )
