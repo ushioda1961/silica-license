@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
     await resend.emails.send({
       from: 'onboarding@resend.dev',
-      to: [email, 'mail@you-planning.org', 'm.kobayashi@silica-creation.jp'],
+            to: [email, 'mail@you-planning.org'],
       subject: `【申込み完了】販売者認定講習・試験 ${desired_month}`,
       html: `
         <h2>申込みが完了しました</h2>
