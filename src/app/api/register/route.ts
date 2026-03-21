@@ -35,6 +35,15 @@ export async function POST(req: Request) {
           <tr><th>所属代理店</th><td>${agency}</td></tr>
         </table>
         <p>受講料（¥5,500）のお支払いをお願いします。</p>
+                  <p>銀行振込の方は以下の口座へお振込をお願いします。</p>
+                            <table border="1" cellpadding="8" style="border-collapse:collapse">
+                                        <tr><th>銀行名</th><td>GMOあおぞらネット銀行</td></tr>
+                                                    <tr><th>支店名</th><td>法人営業部</td></tr>
+                                                                <tr><th>口座種別</th><td>普通</td></tr>
+                                                                            <tr><th>口座番号</th><td>2144755</td></tr>
+                                                                                        <tr><th>口座名義</th><td>カ）ユープランニング</td></tr>
+                                                                                                  </table>
+                                                                                                            <p>※振込手数料はご負担ください。</p>
         <p>ご不明な点はお問い合わせください。</p>
       `,
     })
