@@ -67,9 +67,19 @@ export default function CompletePage() {
           <p className="text-xs text-blue-600">下記いずれかの方法でお支払いください</p>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-4">
           <p className="text-sm font-semibold text-gray-700 mb-3">💳 PayPalでお支払い</p>
           <div ref={paypalRef} />
+        </div>
+
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 text-left">
+          <p className="text-sm font-semibold text-yellow-800 mb-2">⚠️ PayPalでお支払いできない場合</p>
+          <ul className="text-xs text-yellow-700 space-y-1 list-disc list-inside">
+            <li>PayPalアカウントをお持ちでない方</li>
+            <li>クレジットカードがご利用できない方</li>
+            <li>決済エラーが発生した方</li>
+          </ul>
+          <p className="text-xs text-yellow-700 mt-2">上記の場合は、下記の銀行振込をご利用ください。</p>
         </div>
 
         <div className="border rounded-xl p-4 mb-6 text-left bg-gray-50">
