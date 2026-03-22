@@ -10,9 +10,11 @@ function shuffle(arr:unknown[]){const a=[...arr];for(let i=a.length-1;i>0;i--){c
 type URow={user_name:string;total_xp:number;level:number;session_count:number}
 const RC:Record<string,string>={'ルーキー':'#3bbfef','セールス':'#ff8c42','エキスパート':'#ef476f','マスター':'#9b59b6','レジェンド':'#e74c3c','神':'#f39c12'}
 export default function TrainingPage(){
-  const[sc,setSc]=useState('register')
+  const[sc,setSc]=useState('login')
   const[nm,setNm]=useState('')
-  const[inp,setInp]=useState('')
+  const[phone6,setPhone6]=useState('')
+  const[loginErr,setLoginErr]=useState('')
+  const[loginLoading,setLoginLoading]=useState(false)
   const[xp,setXp]=useState(0)
   const[sxp,setSxp]=useState(0)
   const[qs,setQs]=useState<typeof QS>([])
@@ -27,8 +29,21 @@ export default function TrainingPage(){
   const[ranking,setRanking]=useState<URow[]>([])
   useEffect(()=>{fetchRanking()},[])
   async function fetchRanking(){const{data}=await supabase.from('silica_training_users').select('user_name,total_xp,level,session_count').order('total_xp',{ascending:false}).limit(20);if(data)setRanking(data)}
+  async function login(){
+    if(phone6.length!==6||!/^\d{6}$/.test(phone6)){setLoginErr('電話番号の下6桁（数字のみ）を入力してください');return}
+    setLoginLoading(true);setLoginErr('')
+    const{data:applicants}=await supabase.from('applicants').select('name,phone').like('phone','%'+phone6)
+    if(!applicants||applicants.length===0){setLoginErr('申込みが確認できませんでした。電話番号の下6桁をご確認ください。');setLoginLoading(false);return}
+    if(applicants.length>1){setLoginErr('複数の申込みが一致しました。事務局にお問い合わせください。');setLoginLoading(false);return}
+    const name=applicants[0].name
+    setNm(name)
+    const{data:existing}=await supabase.from('silica_training_users').select('total_xp').eq('user_name',name).single()
+    if(!existing){await supabase.from('silica_training_users').insert({user_name:name,total_xp:0,level:1,session_count:0})}
+    else{setXp(existing.total_xp||0)}
+    setLoginLoading(false)
+    setSc('start')
+  }
   async function loadU(n:string){const{data}=await supabase.from('silica_training_users').select('total_xp').eq('user_name',n).single();if(data)setXp(data.total_xp||0)}
-  async function reg(){if(!inp.trim())return;setNm(inp.trim());const{data}=await supabase.from('silica_training_users').select('user_name').eq('user_name',inp.trim()).single();if(!data)await supabase.from('silica_training_users').insert({user_name:inp.trim()});await loadU(inp.trim());setSc('start')}
   async function start(){await loadU(nm);setQs(shuffle(QS).slice(0,5) as typeof QS);setQi(0);setSc2(0);setSt(0);setSxp(0);setAns(false);setSel(null);setFb('');setSc('quiz')}
   async function pick(idx:number){if(ans)return;setAns(true);setSel(idx);const q=qs[qi];const ok=idx===q.a;let ax=q.d==='hard'?3:2;let ns=st;if(ok){ns=st+1;if(ns>=3)ax+=1;setSc2(s=>s+1);setSt(ns)}else{ns=0;setSt(0)};const add=ok?ax:0;const msg=ok?('正解+'+add+'XP'+(ns>=3?' 炎ボーナス':'')):('不正解:'+q.o[q.a]);setFb(msg+' / '+q.e);if(ok){const pl=getLv(xp);const nx2=xp+add;const nl=getLv(nx2);setXp(nx2);setSxp(s=>s+add);if(nl.lv>pl.lv)setLum('LvUP! Lv.'+nl.lv+' '+nl.name)}}
   async function next(){if(qi+1>=qs.length){setSav(true);await supabase.from('silica_training_sessions').insert({user_name:nm,score:sc2,total:qs.length,xp_gained:sxp});await supabase.from('silica_training_users').update({total_xp:xp,level:getLv(xp).lv,last_trained_at:new Date().toISOString()}).eq('user_name',nm);await fetchRanking();setSav(false);setSc('result')}else{setQi(i=>i+1);setAns(false);setSel(null);setFb('')}}
@@ -36,7 +51,7 @@ export default function TrainingPage(){
   return(<div style={{minHeight:'100vh',background:'linear-gradient(160deg,#b8eaff 0%,#e8f9ff 40%,#fffbe6 100%)',fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:'20px 16px 60px'}}>
     <div style={{maxWidth:560,margin:'0 auto'}}>
       <h1 style={{textAlign:'center',fontSize:'1.4rem',fontWeight:900,color:'#1a8cc7',marginBottom:8}}>💧 ケイソくんトレーニング</h1>
-      {sc!=='register'&&<div style={{background:'white',borderRadius:16,padding:'12px 16px',marginBottom:12,boxShadow:'0 4px 16px rgba(59,191,239,0.15)'}}>
+      {sc!=='login'&&<div style={{background:'white',borderRadius:16,padding:'12px 16px',marginBottom:12,boxShadow:'0 4px 16px rgba(59,191,239,0.15)'}}>
         <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
           <div style={{width:52,height:52,borderRadius:12,background:lv.g,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',fontSize:'1.4rem'}}><span>{lv.emoji}</span><span style={{fontSize:'0.6rem',fontWeight:800,color:'rgba(255,255,255,0.9)'}}>Lv.{lv.lv}</span></div>
           <div><div style={{fontWeight:900,color:'#2d3a4a'}}>{lv.name}</div><div style={{fontSize:'0.72rem',color:'#6b7f92'}}>👤 {nm} / {lv.rank}</div></div>
@@ -44,13 +59,15 @@ export default function TrainingPage(){
         <div style={{background:'rgba(0,0,0,0.07)',borderRadius:20,height:12,overflow:'hidden'}}><div style={{height:'100%',borderRadius:20,background:lv.g,width:pg+'%',transition:'width 0.8s ease'}}/></div>
         <div style={{display:'flex',justifyContent:'space-between',fontSize:'0.68rem',color:'#6b7f92',marginTop:4,fontWeight:700}}><span>累計 {xp.toLocaleString()} XP</span><span>{nx?'次のLvまで: '+(nx.xp-xp)+' XP':'最高レベル達成！'}</span></div>
       </div>}
-      {sc==='register'&&<>
+      {sc==='login'&&<>
         <div style={{background:'white',borderRadius:20,padding:24,boxShadow:'0 8px 32px rgba(59,191,239,0.18)',textAlign:'center',marginBottom:16}}>
           <div style={{fontSize:'4rem',marginBottom:8}}>💧</div>
           <h2 style={{fontSize:'1.2rem',fontWeight:900,color:'#1a8cc7',marginBottom:8}}>ケイソくんトレーニング</h2>
-          <p style={{fontSize:'0.85rem',color:'#6b7f92',fontWeight:700,marginBottom:20}}>毎日5問でケイ素の知識を身につけよう！XPを獲得してレベルアップ🏆</p>
-          <input value={inp} onChange={e=>setInp(e.target.value)} onKeyDown={e=>e.key==='Enter'&&reg()} placeholder="あなたの名前を入力" style={{width:'100%',padding:'12px 16px',border:'2.5px solid #daedf7',borderRadius:12,fontSize:'1rem',fontWeight:700,marginBottom:12,outline:'none',fontFamily:'inherit',boxSizing:'border-box'}}/>
-          <button onClick={reg} style={{width:'100%',padding:14,background:'linear-gradient(135deg,#3bbfef,#1a8cc7)',color:'white',border:'none',borderRadius:14,fontSize:'1rem',fontWeight:900,cursor:'pointer',fontFamily:'inherit'}}>スタート！🚀</button>
+          <p style={{fontSize:'0.85rem',color:'#6b7f92',fontWeight:700,marginBottom:20}}>申込み時の電話番号の<strong>下6桁</strong>を入力してログイン</p>
+          <input value={phone6} onChange={e=>setPhone6(e.target.value.replace(/[^0-9]/g,'').slice(0,6))} onKeyDown={e=>e.key==='Enter'&&login()} placeholder='例：901234' maxLength={6} inputMode='numeric' style={{width:'100%',padding:'14px 16px',border:'2.5px solid #daedf7',borderRadius:12,fontSize:'1.4rem',fontWeight:800,marginBottom:8,outline:'none',fontFamily:'inherit',boxSizing:'border-box',textAlign:'center',letterSpacing:'0.3em'}}/>
+          {loginErr&&<p style={{color:'#ef476f',fontSize:'0.8rem',fontWeight:700,marginBottom:8}}>{loginErr}</p>}
+          <button onClick={login} disabled={loginLoading||phone6.length!==6} style={{width:'100%',padding:14,background:phone6.length===6?'linear-gradient(135deg,#3bbfef,#1a8cc7)':'#ccc',color:'white',border:'none',borderRadius:14,fontSize:'1rem',fontWeight:900,cursor:phone6.length===6?'pointer':'default',fontFamily:'inherit'}}>{loginLoading?'確認中...':'ログイン 🚀'}</button>
+          <p style={{fontSize:'0.72rem',color:'#aaa',marginTop:12}}>※申込み済みの方のみログインできます</p>
         </div>
         {ranking.length>0&&<div style={{background:'white',borderRadius:20,padding:'16px 18px',boxShadow:'0 8px 32px rgba(59,191,239,0.18)'}}>
           <h3 style={{fontSize:'1rem',fontWeight:900,color:'#1a8cc7',marginBottom:12,textAlign:'center'}}>🏆 ランキング TOP{ranking.length}</h3>
@@ -66,10 +83,12 @@ export default function TrainingPage(){
       </>}
       {sc==='start'&&<div style={{background:'white',borderRadius:20,padding:24,boxShadow:'0 8px 32px rgba(59,191,239,0.18)',textAlign:'center'}}>
         <div style={{fontSize:'3rem',marginBottom:8}}>🎯</div>
-        <h2 style={{fontSize:'1.2rem',fontWeight:900,color:'#1a8cc7',marginBottom:8}}>今日のトレーニング</h2>
+        <h2 style={{fontSize:'1.2rem',fontWeight:900,color:'#1a8cc7',marginBottom:4}}>今日のトレーニング</h2>
+        <p style={{fontSize:'0.95rem',fontWeight:700,color:'#2d3a4a',marginBottom:4}}>{nm}さん、ようこそ！</p>
         <p style={{fontSize:'0.85rem',color:'#6b7f92',fontWeight:700,marginBottom:20}}>5問チャレンジ！正解してXPを獲得🔥</p>
         {lum&&<div style={{background:'#e6fff7',border:'2px solid #06d6a0',borderRadius:12,padding:12,marginBottom:16,fontWeight:800,color:'#008060'}}>{lum}</div>}
         <button onClick={start} style={{width:'100%',padding:14,background:'linear-gradient(135deg,#3bbfef,#1a8cc7)',color:'white',border:'none',borderRadius:14,fontSize:'1rem',fontWeight:900,cursor:'pointer',fontFamily:'inherit'}}>スタート！🚀</button>
+        <button onClick={()=>{setNm('');setPhone6('');setXp(0);setSc('login')}} style={{width:'100%',marginTop:8,padding:10,background:'none',border:'1.5px solid #daedf7',borderRadius:14,fontSize:'0.85rem',fontWeight:700,cursor:'pointer',color:'#6b7f92',fontFamily:'inherit'}}>別のアカウントでログイン</button>
       </div>}
       {sc==='quiz'&&q&&<div>
         <div style={{display:'flex',gap:8,marginBottom:12}}>{[{n:sc2,l:'正解'},{n:st,l:'連続'},{n:5-qi,l:'残り'}].map((s,i)=>(<div key={i} style={{flex:1,background:'white',borderRadius:12,padding:'8px 10px',textAlign:'center',boxShadow:'0 2px 8px rgba(0,0,0,0.07)'}}><div style={{fontSize:'1.3rem',fontWeight:900,color:'#1a8cc7'}}>{s.n}</div><div style={{fontSize:'0.65rem',color:'#6b7f92',fontWeight:700}}>{s.l}</div></div>))}</div>
