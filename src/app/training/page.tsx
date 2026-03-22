@@ -54,8 +54,8 @@ const QS = [
   {q:"水溶性ケイ素の8つの特徴に含まれないのは？",o:["脂肪溶解力","抗酸化力","筋肉増強力","浸透力"],a:2,e:"8つの特徴：消炎力・脂肪溶解力・抗酸化力・洗浄力・中和力・浸透力・精菌力・テラヘルツ。",d:"hard"},
   {q:"ホワイトシリカを火にかけるとどうなりますか？",o:["全て蒸発する","毒素が発生する","性質は変わらない","効果が2倍になる"],a:2,e:"火にかけても性質は全く変わりません。料理での活用もできます。",d:"easy"},
 ]
-function getLv(xp){let r=LEVELS[0];for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].xp){r=LEVELS[i];break}}return r}
-function getNextLv(xp){for(const l of LEVELS){if(xp<l.xp)return l}return null}
+function getLv(xp: number){let r=LEVELS[0];for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].xp){r=LEVELS[i];break}}return r}
+function getNextLv(xp: number){for(const l of LEVELS){if(xp<l.xp)return l}return null}
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 export default function TrainingPage(){
   const[sc,setSc]=useState('register')
