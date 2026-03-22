@@ -56,7 +56,7 @@ const QS = [
 ]
 function getLv(xp: number){let r=LEVELS[0];for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].xp){r=LEVELS[i];break}}return r}
 function getNextLv(xp: number){for(const l of LEVELS){if(xp<l.xp)return l}return null}
-function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function shuffle(arr: unknown[]){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 export default function TrainingPage(){
   const[sc,setSc]=useState('register')
   const[nm,setNm]=useState('')
