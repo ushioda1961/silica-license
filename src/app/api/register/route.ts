@@ -40,8 +40,8 @@ export async function POST(req: Request) {
         <p>※振込手数料はご負担ください。</p>
         <p>ご不明な点はお問い合わせください。</p>
         <hr style="margin:24px 0">
-        <h3 style="color:#1a8cc7">💧 ケイソくんトレーニングのご案内</h3>
-        <p>試験対策として、<strong>ケイソくんトレーニング</strong>をぜひご活用ください！</p>
+        <h3 style="color:#1a8cc7">💧 シリカトレーニングのご案内</h3>
+        <p>試験対策として、<strong>シリカトレーニング</strong>をぜひご活用ください！</p>
         <p>毎日5問のクイズでケイ素の知識を楽しく身につけられます。<br>
         XPを獲得してレベルアップ、ランキングで他の受講者と競い合いましょう！</p>
         <p style="margin:16px 0">
