@@ -72,7 +72,7 @@ export default function TrainingPage(){
   const[fb,setFb]=useState('')
   const[lum,setLum]=useState('')
   const[sav,setSav]=useState(false)
-  async function loadU(n){const{data}=await supabase.from('silica_training_users').select('total_xp').eq('user_name',n).single();if(data)setXp(data.total_xp||0)}
+  async function loadU(n: string){const{data}=await supabase.from('silica_training_users').select('total_xp').eq('user_name',n).single();if(data)setXp(data.total_xp||0)}
   async function reg(){
     if(!inp.trim())return
     setNm(inp.trim())
