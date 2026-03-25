@@ -47,7 +47,6 @@ export default function TrainingPage(){
     const{data:ex}=await supabase.from('silica_training_users').select('total_xp,nickname').eq('user_name',uname).single()
     if(!ex){await supabase.from('silica_training_users').insert({user_name:uname,total_xp:0,level:1,session_count:0});setXp(0);setNm(uname);setLogging(false);setSc('nickname')}
     else{setXp(ex.total_xp||0);setNm(uname);await loadTodaySets(uname);if(!ex.nickname){setLogging(false);setSc('nickname')}else{setNick(ex.nickname);setLogging(false);setSc('start')}}
-  }
   async function register(){if(regCode.trim()!=='keisolove'){setRegErr('合言葉が正しくありません');return} if(!regName.trim()){setRegErr('お名前を入力してください');return} if(regTel.trim().length!==6){setRegErr('電話番号の下6桁を入力してください');return} setRegLoading(true);setRegErr('') const uname=regName.trim() const{data:ex}=await supabase.from('silica_training_users').select('total_xp,nickname').eq('user_name',uname).single() if(ex){setXp(ex.total_xp||0);setNm(uname);await loadTodaySets(uname);if(!ex.nickname){setRegLoading(false);setSc('nickname')}else{setNick(ex.nickname);setRegLoading(false);setSc('start')}}else{await supabase.from('silica_training_users').insert({user_name:uname,total_xp:0,level:1,session_count:0});setXp(0);setNm(uname);setRegLoading(false);setSc('nickname')} } async function saveNickname(){
     const n=nickInp.trim()
     if(!n){setNickErr('ニックネームを入力してください');return}
