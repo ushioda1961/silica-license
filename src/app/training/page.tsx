@@ -32,7 +32,7 @@ export default function TrainingPage(){
   const[lum,setLum]=useState('')
   const[sav,setSav]=useState(false)
   const[ranking,setRanking]=useState<URow[]>([])
-  const[todaySets,setTodaySets]=useState(0) const[loginTab,setLoginTab]=useState('login') const[regName,setRegName]=useState('') const[regTel,setRegTel]=useState('') const[regCode,setRegCode]=useState('') const[regErr,setRegErr]=useState('') const[regLoading,setRegLoading]=useState(false) const[loginTab,setLoginTab]=useState<'login'|'register'>('login') const[regName,setRegName]=useState('') const[regTel,setRegTel]=useState('') const[regCode,setRegCode]=useState('') const[regErr,setRegErr]=useState('') const[regLoading,setRegLoading]=useState(false)
+  const[todaySets,setTodaySets]=useState(0) const[loginTab,setLoginTab]=useState('login') const[regName,setRegName]=useState('') const[regTel,setRegTel]=useState('') const[regCode,setRegCode]=useState('') const[regErr,setRegErr]=useState('') const[regLoading,setRegLoading]=useState(false)
   useEffect(()=>{fetchRanking()},[])
   async function fetchRanking(){const{data}=await supabase.from('silica_training_users').select('user_name,nickname,total_xp,level').order('total_xp',{ascending:false}).limit(20);if(data)setRanking(data)}
   async function loadTodaySets(uname:string){const today=todayJST();const{data}=await supabase.from('silica_training_sessions').select('id').eq('user_name',uname).gte('trained_at',today+'T00:00:00+09:00').lte('trained_at',today+'T23:59:59+09:00');const count=data?data.length:0;setTodaySets(count);return count}
